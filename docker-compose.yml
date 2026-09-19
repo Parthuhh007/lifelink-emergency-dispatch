@@ -1,0 +1,102 @@
+services:
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - lifelink_network
+
+  api-gateway:
+    build: 
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - USER_SERVICE_URL=http://user-service:3002
+      - EMERGENCY_SERVICE_URL=http://emergency-service:3003
+      - RESPONSE_SERVICE_URL=http://response-service:3004
+      - ADMIN_SERVICE_URL=http://admin-service:3005
+    networks:
+      - lifelink_network
+    depends_on:
+      - auth-service
+      - user-service
+      - emergency-service
+      - response-service
+      - admin-service
+
+  auth-service:
+    build: 
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/lifelink
+      - JWT_SECRET=supersecretjwtkey
+    networks:
+      - lifelink_network
+    depends_on:
+      - mongodb
+
+  user-service:
+    build: 
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongodb:27017/lifelink
+    networks:
+      - lifelink_network
+    depends_on:
+      - mongodb
+
+  emergency-service:
+    build: 
+      context: ./services/emergency-service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongodb:27017/lifelink
+      - RESPONSE_SERVICE_URL=http://response-service:3004
+    networks:
+      - lifelink_network
+    depends_on:
+      - mongodb
+
+  response-service:
+    build: 
+      context: ./services/response-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004" # Exposing for WebSockets if needed, or gateway can route WS
+    environment:
+      - PORT=3004
+      - MONGODB_URI=mongodb://mongodb:27017/lifelink
+    networks:
+      - lifelink_network
+    depends_on:
+      - mongodb
+
+  admin-service:
+    build: 
+      context: ./services/admin-service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3005
+      - MONGODB_URI=mongodb://mongodb:27017/lifelink
+    networks:
+      - lifelink_network
+    depends_on:
+      - mongodb
+
+networks:
+  lifelink_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
