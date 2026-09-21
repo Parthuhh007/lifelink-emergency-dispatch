@@ -1,31 +1,14 @@
-# Python
+﻿node_modules/
+**/node_modules/
+dist/
+build/
+.vite/
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-.venv
-
-# Testing & Coverage
+*.pyc
 .pytest_cache/
-.coverage
-htmlcov/
-
-# Local Environment & Secrets
+.venv/
+venv/
 .env
-*.local
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# IDEs & OS
-.vscode/
-.idea/
-*.swp
-.DS_Store
-Thumbs.db
+.env.*
+!.env.example
+*.log

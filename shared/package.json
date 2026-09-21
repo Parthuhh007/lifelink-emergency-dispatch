@@ -1,0 +1,10 @@
+{
+  "name": "lifelink-shared",
+  "version": "1.0.0",
+  "description": "Shared models and config for Lifelink microservices",
+  "main": "index.js",
+  "dependencies": {
+    "mongoose": "^8.3.0",
+    "dotenv": "^16.4.5"
+  }
+}
